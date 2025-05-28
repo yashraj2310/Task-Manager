@@ -1,26 +1,23 @@
 import express from 'express';
-import { protect } from '../middleware/authMiddleware.js'; // Assuming this path is correct
+import { protect } from '../middleware/authMiddleware.js'; 
 import Task from '../models/Task.js'; 
 
 const router = express.Router();
 
-// Apply protect middleware to all routes in this router
-// router.use(protect); // You can apply it globally here or per route.
-// Applying per route as in our previous examples gives more granular control if needed.
 
-// POST /api/tasks - Create a new task
-router.post('/', protect, async (req, res) => { // Added protect here
-    const { title, description, status } = req.body; // Expect title, description, status
 
-    if (!title) { // Validate title
+router.post('/', protect, async (req, res) => { 
+    const { title, description, status } = req.body; 
+
+    if (!title) { 
         return res.status(400).json({ message: 'Title is required' });
     }
 
     try {
         const task = await Task.create({
             title,
-            description: description || '', // Handle optional description
-            status: status || 'pending',   // Handle optional status, default to pending
+            description: description || '', 
+            status: status || 'pending',  
             user: req.user._id, 
         });
         res.status(201).json(task);
@@ -34,8 +31,7 @@ router.post('/', protect, async (req, res) => { // Added protect here
     }
 });
 
-// GET /api/tasks - Get all tasks for the logged-in user
-router.get('/', protect, async (req, res) => { // Added protect here
+router.get('/', protect, async (req, res) => { 
     try {
         const tasks = await Task.find({ user: req.user._id }).sort({ createdAt: -1 });
         res.status(200).json(tasks);
@@ -45,7 +41,6 @@ router.get('/', protect, async (req, res) => { // Added protect here
     }
 });
 
-// GET /api/tasks/:id - Get a single task by ID (Added for completeness)
 router.get('/:id', protect, async (req, res) => {
     try {
       const task = await Task.findById(req.params.id);
@@ -67,9 +62,8 @@ router.get('/:id', protect, async (req, res) => {
 });
 
 
-// PUT /api/tasks/:id - Update a task
-router.put('/:id', protect, async (req, res) => { // Added protect here
-    const { title, description, status } = req.body; // Expect title, description, status
+router.put('/:id', protect, async (req, res) => { 
+    const { title, description, status } = req.body; 
     const taskId = req.params.id;
 
     try {
@@ -89,7 +83,7 @@ router.put('/:id', protect, async (req, res) => { // Added protect here
         if (status !== undefined) task.status = status;
 
         // Check if anything was actually modified before saving
-        if (task.isModified()) { // General check for any modification
+        if (task.isModified()) { 
             await task.save();
         } else if (title === undefined && description === undefined && status === undefined) {
             return res.status(400).json({ message: 'No update fields provided' });
@@ -109,7 +103,6 @@ router.put('/:id', protect, async (req, res) => { // Added protect here
     }
 });
 
-// DELETE /api/tasks/:id - Delete a task
 router.delete('/:id', protect, async (req, res) => { // Added protect here
     const taskId = req.params.id;
 
@@ -124,7 +117,6 @@ router.delete('/:id', protect, async (req, res) => { // Added protect here
             return res.status(403).json({ message: 'User not authorized to delete this task' });
         }
 
-        // await task.remove(); // remove() is deprecated in newer Mongoose
         await Task.deleteOne({ _id: taskId });
 
 

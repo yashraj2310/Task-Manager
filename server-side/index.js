@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.send('Task Manager API is running (ESM with MongoDB)!');
+    res.send('Task Manager is running!');
 });
 
 app.use('/api/auth', authRoutes);

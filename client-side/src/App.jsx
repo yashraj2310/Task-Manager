@@ -1,18 +1,16 @@
 import React from 'react';
-import { Routes, Route, Link, Navigate, useNavigate } 
-from 'react-router-dom';
+import { Routes, Route, Link, Navigate } from 'react-router-dom'; // Removed useNavigate as logout is handled by context
 import { useAuth } from './context/AuthContext'; 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import NotFoundPage from './pages/NotFoundPage';
+import UserProfileDropdown from './components/UserProfileDropdown'; 
 
 function App() {
   const { isAuthenticated, logout, currentUser, loadingAuth } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-  };
+ 
 
   if (loadingAuth) {
     return ( 
@@ -23,7 +21,6 @@ function App() {
   }
 
   return (
-   
     <div> 
       <header className="bg-white shadow-md">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -32,14 +29,10 @@ function App() {
               <Link to="/" className="text-2xl font-bold text-indigo-600">
                 Task Manager
               </Link>
-              {currentUser && (
-                <span className="ml-3 text-sm font-medium text-gray-600">
-                  ({currentUser.username})
-                </span>
-              )}
+             
             </div>
             <div className="flex items-center">
-              <ul className="flex space-x-4">
+              <ul className="flex space-x-4 items-center"> 
                 {isAuthenticated && (
                   <li>
                     <Link 
@@ -70,14 +63,9 @@ function App() {
                     </Link>
                   </li>
                 )}
-                {isAuthenticated && (
+                {isAuthenticated && currentUser && ( // Ensure currentUser exists before rendering dropdown
                   <li>
-                    <button 
-                      onClick={handleLogout} 
-                      className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      Logout
-                    </button>
+                    <UserProfileDropdown user={currentUser} onLogout={logout} />
                   </li>
                 )}
               </ul>
@@ -86,8 +74,8 @@ function App() {
         </nav>
       </header>
       
-
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {/* Routes remain the same */}
         <Routes>
           <Route 
             path="/login" 
@@ -97,7 +85,6 @@ function App() {
             path="/register" 
             element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/dashboard" replace />} 
           />
-          
           <Route 
             path="/dashboard" 
             element={
@@ -118,6 +105,8 @@ function App() {
     </div>
   );
 }
+
+// ProtectedRoute remains the same
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loadingAuth } = useAuth();
 
@@ -134,6 +123,5 @@ const ProtectedRoute = ({ children }) => {
   }
   return children;
 };
-
 
 export default App;

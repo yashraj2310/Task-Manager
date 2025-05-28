@@ -6,7 +6,6 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
-// POST /api/auth/register
 router.post('/register', async (req, res) => {
     const { username, email, password } = req.body;
 
@@ -29,7 +28,7 @@ router.post('/register', async (req, res) => {
         const newUser = await User.create({
             username,
             email,
-            passwordHash: password, // Pass the plain password; model will hash it
+            passwordHash: password, 
         });
 
         if (newUser) {
@@ -43,13 +42,12 @@ router.post('/register', async (req, res) => {
                 message: 'User registered successfully',
                 token,
                 user: {
-                    id: newUser._id, // Use _id from MongoDB
+                    id: newUser._id, 
                     username: newUser.username,
                     email: newUser.email,
                 },
             });
         } else {
-            // This case should be rare if validation passes but creation fails for other reasons
             res.status(400).json({ message: 'Invalid user data' });
         }
     } catch (error) {
@@ -70,7 +68,6 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// POST /api/auth/login
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -79,10 +76,9 @@ router.post('/login', async (req, res) => {
     }
 
     try {
-        // Find user by username
         const user = await User.findOne({ username });
 
-        if (user && (await user.comparePassword(password))) { // Use the model's method
+        if (user && (await user.comparePassword(password))) { 
             const token = jwt.sign(
                 { userId: user._id, username: user.username, email: user.email },
                 process.env.JWT_SECRET,
