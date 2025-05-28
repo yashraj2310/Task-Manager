@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 
-// Create the context
 const AuthContext = createContext(null);
 
 // Create a custom hook to use the auth context easily
@@ -9,14 +8,12 @@ export const useAuth = () => {
   return useContext(AuthContext);
 };
 
-// Create the provider component
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true); // To handle initial auth check
   const navigate = useNavigate();
 
-  // Effect to check for existing token and user data on initial load
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
@@ -36,7 +33,6 @@ export const AuthProvider = ({ children }) => {
     setLoading(false); // Finished initial auth check
   }, []);
 
-  // Login function to be called from LoginPage
   const login = (userData, userToken) => {
     localStorage.setItem('token', userToken);
     localStorage.setItem('user', JSON.stringify(userData));

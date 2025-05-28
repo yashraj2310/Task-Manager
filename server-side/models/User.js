@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre('save', async function (next) {
-    if (!this.isModified('passwordHash')) { // Only hash if password field is modified
+    if (!this.isModified('passwordHash')) { 
         return next();
     }
     try {
@@ -39,11 +39,10 @@ userSchema.pre('save', async function (next) {
         this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
         next();
     } catch (error) {
-        next(error); // Pass error to the next middleware/error handler
+        next(error); 
     }
 });
 
-// Method to compare entered password with the stored hashed password
 userSchema.methods.comparePassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.passwordHash);
 };
