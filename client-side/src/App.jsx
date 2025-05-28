@@ -1,27 +1,28 @@
-import React from 'react';
-import { Routes, Route, Link, Navigate } from 'react-router-dom'; // Removed useNavigate as logout is handled by context
-import { useAuth } from './context/AuthContext'; 
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import DashboardPage from './pages/DashboardPage';
-import NotFoundPage from './pages/NotFoundPage';
-import UserProfileDropdown from './components/UserProfileDropdown'; 
+import React from "react";
+import { Routes, Route, Link, Navigate } from "react-router-dom"; // Removed useNavigate as logout is handled by context
+import { useAuth } from "./context/AuthContext";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import DashboardPage from "./pages/DashboardPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import UserProfileDropdown from "./components/UserProfileDropdown";
+import TaskDetailPage from "./pages/TaskDetailPage";
 
 function App() {
   const { isAuthenticated, logout, currentUser, loadingAuth } = useAuth();
 
- 
-
   if (loadingAuth) {
-    return ( 
+    return (
       <div className="min-h-screen bg-slate-100 flex justify-center items-center">
-        <div className="text-xl font-semibold text-gray-700">Loading application...</div>
+        <div className="text-xl font-semibold text-gray-700">
+          Loading application...
+        </div>
       </div>
     );
   }
 
   return (
-    <div> 
+    <div>
       <header className="bg-white shadow-md">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -29,14 +30,13 @@ function App() {
               <Link to="/" className="text-2xl font-bold text-indigo-600">
                 Task Manager
               </Link>
-             
             </div>
             <div className="flex items-center">
-              <ul className="flex space-x-4 items-center"> 
+              <ul className="flex space-x-4 items-center">
                 {isAuthenticated && (
                   <li>
-                    <Link 
-                      to="/dashboard" 
+                    <Link
+                      to="/dashboard"
                       className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
                     >
                       Dashboard
@@ -45,8 +45,8 @@ function App() {
                 )}
                 {!isAuthenticated && (
                   <li>
-                    <Link 
-                      to="/login" 
+                    <Link
+                      to="/login"
                       className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
                     >
                       Login
@@ -55,49 +55,77 @@ function App() {
                 )}
                 {!isAuthenticated && (
                   <li>
-                    <Link 
-                      to="/register" 
+                    <Link
+                      to="/register"
                       className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
                     >
                       Register
                     </Link>
                   </li>
                 )}
-                {isAuthenticated && currentUser && ( // Ensure currentUser exists before rendering dropdown
-                  <li>
-                    <UserProfileDropdown user={currentUser} onLogout={logout} />
-                  </li>
-                )}
+                {isAuthenticated &&
+                  currentUser && ( // Ensure currentUser exists before rendering dropdown
+                    <li>
+                      <UserProfileDropdown
+                        user={currentUser}
+                        onLogout={logout}
+                      />
+                    </li>
+                  )}
               </ul>
             </div>
           </div>
         </nav>
       </header>
-      
+
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {/* Routes remain the same */}
         <Routes>
-          <Route 
-            path="/login" 
-            element={!isAuthenticated ? <LoginPage /> : <Navigate to="/dashboard" replace />} 
+          <Route
+            path="/login"
+            element={
+              !isAuthenticated ? (
+                <LoginPage />
+              ) : (
+                <Navigate to="/dashboard" replace />
+              )
+            }
           />
-          <Route 
-            path="/register" 
-            element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/dashboard" replace />} 
+          <Route
+            path="/register"
+            element={
+              !isAuthenticated ? (
+                <RegisterPage />
+              ) : (
+                <Navigate to="/dashboard" replace />
+              )
+            }
           />
-          <Route 
-            path="/dashboard" 
+          <Route
+            path="/dashboard"
             element={
               <ProtectedRoute>
                 <DashboardPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/" 
+          <Route
+            path="/task/:taskId"
             element={
-              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
-            } 
+              <ProtectedRoute>
+                <TaskDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
           />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
@@ -111,9 +139,11 @@ const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loadingAuth } = useAuth();
 
   if (loadingAuth) {
-    return ( 
+    return (
       <div className="min-h-screen bg-slate-100 flex justify-center items-center">
-        <div className="text-xl font-semibold text-gray-700">Checking authentication...</div>
+        <div className="text-xl font-semibold text-gray-700">
+          Checking authentication...
+        </div>
       </div>
     );
   }

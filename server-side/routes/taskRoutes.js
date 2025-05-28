@@ -1,6 +1,7 @@
 import express from 'express';
 import { protect } from '../middleware/authMiddleware.js'; 
 import Task from '../models/Task.js'; 
+import SubTask from '../models/SubTask.js';
 
 const router = express.Router();
 
@@ -42,23 +43,29 @@ router.get('/', protect, async (req, res) => {
 });
 
 router.get('/:id', protect, async (req, res) => {
-    try {
-      const task = await Task.findById(req.params.id);
-  
-      if (!task) {
-        return res.status(404).json({ message: 'Task not found' });
-      }
-      if (task.user.toString() !== req.user._id.toString()) {
-        return res.status(401).json({ message: 'Not authorized' });
-      }
-      res.json(task);
-    } catch (error) {
-      console.error(error);
-      if (error.kind === 'ObjectId') {
-        return res.status(404).json({ message: 'Task not found' });
-      }
-      res.status(500).json({ message: 'Server Error' });
+  try {
+    const task = await Task.findById(req.params.id);
+    
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
     }
+    if (task.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    // Fetch associated sub-tasks
+    const subTasks = await SubTask.find({ parentTask: task._id, user: req.user._id }).sort({ createdAt: 'asc' });
+
+    // Send both task and its sub-tasks in the expected structure
+    res.json({ task: task, subTasks: subTasks }); // <<<< KEY CHANGE HERE
+
+  } catch (error) {
+    console.error('Error fetching single task with subtasks:', error);
+    if (error.kind === 'ObjectId') {
+      return res.status(404).json({ message: 'Task not found (invalid ID format)' });
+    }
+    res.status(500).json({ message: 'Server Error' });
+  }
 });
 
 

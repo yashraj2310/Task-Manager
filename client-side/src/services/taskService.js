@@ -36,10 +36,7 @@ export const getTasks = async () => {
   }
 };
 
-/**
- * Creates a new task.
- * @param {object} taskData - { title, description, status }
- */
+
 export const createTask = async (taskData) => {
   try {
     const response = await axiosInstance.post('/', taskData);
@@ -50,11 +47,7 @@ export const createTask = async (taskData) => {
   }
 };
 
-/**
- * Updates an existing task.
- * @param {string} taskId - The ID of the task to update.
- * @param {object} taskData - { title, description, status }
- */
+
 export const updateTask = async (taskId, taskData) => {
   try {
     const response = await axiosInstance.put(`/${taskId}`, taskData);
@@ -65,10 +58,7 @@ export const updateTask = async (taskId, taskData) => {
   }
 };
 
-/**
- * Deletes a task.
- * @param {string} taskId - The ID of the task to delete.
- */
+
 export const deleteTask = async (taskId) => {
   try {
     const response = await axiosInstance.delete(`/${taskId}`);
@@ -76,5 +66,58 @@ export const deleteTask = async (taskId) => {
   } catch (error) {
     console.error('Error deleting task:', error.response?.data || error.message);
     throw new Error(error.response?.data?.message || 'Failed to delete task');
+  }
+};
+
+export const getTaskWithSubTasks = async (taskId) => {
+  try {
+    const response = await axiosInstance.get(`/${taskId}`); //  GET /api/tasks/:taskId
+    return response.data; // Expected: { task: {...}, subTasks: [...] }
+  } catch (error) {
+    console.error(`Error fetching task ${taskId} with sub-tasks:`, error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || `Failed to fetch task ${taskId}`);
+  }
+};
+
+export const getSubTasks = async (parentTaskId) => {
+  try {
+    //  URL structure: /api/tasks/:parentTaskId/subtasks
+    const response = await axiosInstance.get(`/${parentTaskId}/subtasks`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching sub-tasks for task ${parentTaskId}:`, error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || 'Failed to fetch sub-tasks');
+  }
+};
+
+export const createSubTask = async (parentTaskId, subTaskData) => {
+  try {
+    const response = await axiosInstance.post(`/${parentTaskId}/subtasks`, subTaskData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error creating sub-task for task ${parentTaskId}:`, error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || 'Failed to create sub-task');
+  }
+};
+
+
+export const updateSubTask = async (parentTaskId, subTaskId, subTaskData) => {
+  try {
+    const response = await axiosInstance.put(`/${parentTaskId}/subtasks/${subTaskId}`, subTaskData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating sub-task ${subTaskId}:`, error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || 'Failed to update sub-task');
+  }
+};
+
+
+export const deleteSubTask = async (parentTaskId, subTaskId) => {
+  try {
+    const response = await axiosInstance.delete(`/${parentTaskId}/subtasks/${subTaskId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting sub-task ${subTaskId}:`, error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || 'Failed to delete sub-task');
   }
 };

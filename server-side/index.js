@@ -7,6 +7,7 @@ import connectDB from './config/db.js';
 
 import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
+import subTaskRoutes from './routes/subTaskRoutes.js'; 
 
 // Connect to Database
 connectDB(); 
@@ -22,6 +23,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/tasks/:taskId/subtasks', subTaskRoutes);
 
 const PORT = process.env.PORT || 5000;
 
